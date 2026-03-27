@@ -3,6 +3,7 @@ package com.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class Order {
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+    private List<OrderItem> items = new ArrayList<>();
 
     private Double totalPrice;
     private String shippingAddress;
