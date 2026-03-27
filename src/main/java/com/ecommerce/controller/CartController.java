@@ -1,9 +1,8 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dto.CartDto.*;
-import com.ecommerce.entity.User;
-import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.CartService;
+import com.ecommerce.util.AuthUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,33 +16,29 @@ import org.springframework.web.bind.annotation.*;
 public class CartController {
 
     private final CartService cartService;
-    private final UserRepository userRepository;
-
-    private Long getUserId(UserDetails userDetails) {
-        return userRepository.findByEmail(userDetails.getUsername()).map(User::getId).orElseThrow();
-    }
+    private final AuthUtil authUtil;
 
     @GetMapping
     public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cartService.getCart(getUserId(userDetails)));
+        return ResponseEntity.ok(cartService.getCart(authUtil.getUserId(userDetails)));
     }
 
     @PostMapping("/items")
     public ResponseEntity<CartResponse> addItem(@AuthenticationPrincipal UserDetails userDetails,
                                                 @Valid @RequestBody AddItemRequest request) {
-        return ResponseEntity.ok(cartService.addItem(getUserId(userDetails), request));
+        return ResponseEntity.ok(cartService.addItem(authUtil.getUserId(userDetails), request));
     }
 
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> updateItem(@AuthenticationPrincipal UserDetails userDetails,
                                                    @PathVariable Long cartItemId,
                                                    @RequestParam Integer quantity) {
-        return ResponseEntity.ok(cartService.updateItem(getUserId(userDetails), cartItemId, quantity));
+        return ResponseEntity.ok(cartService.updateItem(authUtil.getUserId(userDetails), cartItemId, quantity));
     }
 
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> removeItem(@AuthenticationPrincipal UserDetails userDetails,
                                                    @PathVariable Long cartItemId) {
-        return ResponseEntity.ok(cartService.removeItem(getUserId(userDetails), cartItemId));
+        return ResponseEntity.ok(cartService.removeItem(authUtil.getUserId(userDetails), cartItemId));
     }
 }
